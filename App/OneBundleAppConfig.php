@@ -1,12 +1,27 @@
 <?php
 
+/*
+ * This file is part of the OneBundleApp package.
+ *
+ * Copyright (c) >=2017 Marc Morera
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * Feel free to edit as you please, and have fun.
+ *
+ * @author Marc Morera <yuhu@mmoreram.com>
+ */
+
+declare(strict_types=1);
+
 namespace OneBundleApp\App;
 
-use Symfony\Component\Yaml\Yaml;
 use LogicException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
- * Class OneBundleAppConfig
+ * Class OneBundleAppConfig.
  */
 class OneBundleAppConfig
 {
@@ -25,7 +40,14 @@ class OneBundleAppConfig
     private $config;
 
     /**
-     * Constructor
+     * @var array
+     *
+     * Routes
+     */
+    private $routes;
+
+    /**
+     * Constructor.
      *
      * @param string $appPath
      * @param string $environment
@@ -44,6 +66,7 @@ class OneBundleAppConfig
         $bundles = $configFromYml['bundles'];
         $this->bundles = is_array($bundles) ? $bundles : [$bundles];
         $this->config = $configFromYml['config'] ?? [];
+        $this->routes = $configFromYml['routes'] ?? [];
     }
 
     /**
@@ -61,7 +84,7 @@ class OneBundleAppConfig
     }
 
     /**
-     * Get Bundles
+     * Get Bundles.
      *
      * @return array
      */
@@ -71,12 +94,22 @@ class OneBundleAppConfig
     }
 
     /**
-     * Get Config
+     * Get Config.
      *
      * @return array
      */
     public function getConfig() : array
     {
         return $this->config;
+    }
+
+    /**
+     * Get Routes.
+     *
+     * @return array
+     */
+    public function getRoutes() : array
+    {
+        return $this->routes;
     }
 }

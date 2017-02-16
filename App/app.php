@@ -1,32 +1,29 @@
 <?php
 
+/*
+ * This file is part of the OneBundleApp package.
+ *
+ * Copyright (c) >=2017 Marc Morera
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * Feel free to edit as you please, and have fun.
+ *
+ * @author Marc Morera <yuhu@mmoreram.com>
+ */
+
+declare(strict_types=1);
+
 namespace OneBundleApp\App;
 
-use Symfony\Component\HttpFoundation\Request;
-use Mmoreram\BaseBundle\Kernel\BaseKernel;
-
-$appPath = __DIR__ . '/../../..//';
+$appPath = __DIR__ . '/../../../../';
 $environment = 'prod';
+$debug = false;
 require __DIR__ . '/autoload.php';
 
 if (PHP_VERSION_ID < 70000) {
     include_once $appPath . '/var/bootstrap.php.cache';
 }
 
-$oneBundleAppConfig = new OneBundleAppConfig($appPath, $environment);
-$kernel = new BaseKernel(
-    $oneBundleAppConfig->getBundles(),
-    $oneBundleAppConfig->getConfig(),
-    [], 'prod', false,
-    $appPath . '/var'
-);
-
-if (PHP_VERSION_ID < 70000) {
-    $kernel->loadClassCache();
-}
-
-$request = Request::createFromGlobals();
-$response = $kernel->handle($request);
-$response->send();
-
-$kernel->terminate($request, $response);
+require 'app_common.php';
