@@ -44,7 +44,7 @@ A bundle is meant to be a package. A plugin. A bundle is meant to be an isolated
 package. But, and knowing the real ecosystem we have in front of us, is it
 really this isolated element it was meant to be?
 
-No. At all.
+**Not. At all.**
 
 The package [Symfony Bundle Dependencies](https://github.com/mmoreram/symfony-bundle-dependencies)
 was created some time ago in order to cover these dependency needs. A bundle, as
@@ -80,19 +80,19 @@ both point of entry.
 The second question is then a natural one. Should all bundles be useful in an
 isolated way? Not at all. Tels list some examples.
 
-* **Yes** My bundle exposes a simple API, requiring the PHP library that
+* __**Yes**__ My bundle exposes a simple API, requiring the PHP library that
 connects to database.
-* **Yes** My bundle is a basic console interface to manage queues. No http
+* __**Yes**__ My bundle is a basic console interface to manage queues. No http
 access but some console items
-* **Yes** My bundle is a simple static website
-* **Yes** My bundle is part of a project and should be treatable as a simple
+* __**Yes**__ My bundle is a simple static website
+* __**Yes**__ My bundle is part of a project and should be treatable as a simple
 project as well.
-* **No** My bundle is part of an application and is coupled to it
-* **No** My bundle is a set of services for other bundles or for a final 
+* ***No*** My bundle is part of an application and is coupled to it
+* ***No*** My bundle is a set of services for other bundles or for a final 
 application
-* **No** I have some bundles I want to use, and creating a new Symfony app is
+* ***No*** I have some bundles I want to use, and creating a new Symfony app is
 too much for me. I don't have enough time and I'm lazy.
-* **No** I don't care about what you're talking about
+* ***No*** I don't care about what you're talking about
 
 If your case is not recommended, please keep using the Symfony application.
 Otherwise, if you have a Bundle that should be playable without extra things...
@@ -159,9 +159,10 @@ config:
 
 Some advices here.
 
-* The app.yml should only have one bundle. Add other bundles in dev environment
-like the WebServerBundle. All other bundles should be added as dependencies of
-the bundle. Otherwise, if your case requires more than one bundle, then you may
+* The app.yml should only have **one bundle**. Add other bundles in dev 
+environment like the [WebServerBundle](https://github.com/symfony/web-server-bundle).
+All  other bundles should be added as dependencies of the bundle. Otherwise, if
+your  case requires more than one bundle, then you may
 start thinking about an entire application.
 * These files should be small and only contain configuration elements. Each
 bundle should load their own dependency injection elements.
@@ -171,11 +172,12 @@ part just to load specific bundle routing.yml file.
 After the composer update, the system will create these elements in your bundle
 root.
 
-* a */var* folder, where to add cache, sessions, logs...
-* a */web* folder, with two files. The HTTP entry points *app.php* and the
-*app_dev.php* files. Both files are just soft links.
-* a */bin* folder, with one file. The console entry point *console*. This file
-is just a soft link as well, and has the right permissions to be executable.
+* a `/var` folder, where to add cache, sessions, logs...
+* a `/web` folder, with two files. The HTTP entry points ***app.php*** and the
+***app_dev.php*** files. Both files are just soft links.
+* a `/bin` folder, with one file. The console entry point ***console***. This
+file is just a soft link as well, and has the right permissions to be 
+executable.
 
 That should be enough. Then your bundle should be accessible both from console
 and the HTTP layer. Use an Apache or an Nginx, or even the command
