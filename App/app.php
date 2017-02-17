@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace OneBundleApp\App;
 
-$appPath = __DIR__ . '/../../../../';
+$appPath = __DIR__ . '/../../../..';
 $environment = 'prod';
 $debug = false;
 require __DIR__ . '/autoload.php';

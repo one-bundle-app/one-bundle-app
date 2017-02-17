@@ -19,7 +19,7 @@ namespace OneBundleApp\App;
 
 use Symfony\Component\Debug\Debug;
 
-$appPath = __DIR__ . '/../../../../';
+$appPath = __DIR__ . '/../../../..';
 $environment = 'dev';
 $debug = true;
 

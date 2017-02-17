@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Debug;
 
 set_time_limit(0);
-$appPath = __DIR__ . '/../../..//';
+$appPath = __DIR__ . '/../../../..';
 require __DIR__ . '/autoload.php';
 
 $input = new ArgvInput();
