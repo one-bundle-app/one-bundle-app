@@ -80,19 +80,19 @@ both point of entry.
 The second question is then a natural one. Should all bundles be useful in an
 isolated way? Not at all. Tels list some examples.
 
-* __**Yes**__ My bundle exposes a simple API, requiring the PHP library that
+* **Yes** - My bundle exposes a simple API, requiring the PHP library that
 connects to database.
-* __**Yes**__ My bundle is a basic console interface to manage queues. No http
+* **Yes** - My bundle is a basic console interface to manage queues. No http
 access but some console items
-* __**Yes**__ My bundle is a simple static website
-* __**Yes**__ My bundle is part of a project and should be treatable as a simple
+* **Yes** - My bundle is a simple static website
+* **Yes** - My bundle is part of a project and should be treatable as a simple
 project as well.
-* ***No*** My bundle is part of an application and is coupled to it
-* ***No*** My bundle is a set of services for other bundles or for a final 
+* ***No*** - My bundle is part of an application and is coupled to it
+* ***No*** - My bundle is a set of services for other bundles or for a final 
 application
-* ***No*** I have some bundles I want to use, and creating a new Symfony app is
+* ***No*** - I have some bundles I want to use, and creating a new Symfony app is
 too much for me. I don't have enough time and I'm lazy.
-* ***No*** I don't care about what you're talking about
+* ***No*** - I don't care about what you're talking about
 
 If your case is not recommended, please keep using the Symfony application.
 Otherwise, if you have a Bundle that should be playable without extra things...
