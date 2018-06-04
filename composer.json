@@ -23,11 +23,11 @@
     "require": {
         "php": ">=7.1",
         "mmoreram/base-bundle": "^1.0.7",
-        "symfony/framework-bundle" : "^3.0",
-        "symfony/console": "^3.0",
-        "symfony/http-kernel": "^3.0",
-        "symfony/debug": "^3.0",
-        "symfony/yaml": "^3.0",
+        "symfony/framework-bundle" : "^3.0|^4.0",
+        "symfony/console": "^3.0|^4.0",
+        "symfony/http-kernel": "^3.0|^4.0",
+        "symfony/debug": "^3.0|^4.0",
+        "symfony/yaml": "^3.0|^4.0",
         "mmoreram/symfony-bundle-dependencies": "^2.0"
     },
     "require-dev": {
