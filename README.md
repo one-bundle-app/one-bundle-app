@@ -122,6 +122,27 @@ composer definition.
 }
 ```
 
+By using installEnvironment static method you will install all the environment.
+You can install parts of this environment
+
+```json
+"scripts": {
+    "post-install-cmd": [
+        "OneBundleApp\\App\\ComposerHook::installConsole",
+        "OneBundleApp\\App\\ComposerHook::installReactServer",
+        "OneBundleApp\\App\\ComposerHook::installWebServer",
+    ],
+    // ...
+}
+```
+
+* installConsole - this will install a console endpoint in `bin/console` with
+right usage permissions.
+* installReactServer - this will install a react server in `bin/server` with
+right usage permissions.
+* installWebServer - this will install both prod and dev web endpoints inside
+`web` folder.
+
 In that case, you will download the package `one-bundle-app/one-bundle-app` and,
 after installing or updating, some files will be copied in order to become an
 application following the Symfony app style.

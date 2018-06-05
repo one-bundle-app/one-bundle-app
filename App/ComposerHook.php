@@ -27,8 +27,33 @@ class ComposerHook
      */
     public static function installEnvironment()
     {
+        self::installConsole();
+        self::installReactServer();
+        self::installWebServer();
+    }
+
+    /**
+     * Install react server.
+     */
+    public static function installReactServer()
+    {
         $appPath = __DIR__ . '/../../../..';
-        self::createFolderIfNotExists("$appPath/web");
+        self::createFolderIfNotExists("$appPath/bin");
+        self::createSoftLink(
+            __DIR__,
+            'server.php',
+            "$appPath/bin",
+            'server'
+        );
+        @chmod("$appPath/bin/server", 0755);
+    }
+
+    /**
+     * Install one bundle console.
+     */
+    public static function installConsole()
+    {
+        $appPath = __DIR__ . '/../../../..';
         self::createFolderIfNotExists("$appPath/bin");
         self::createSoftLink(
             __DIR__,
@@ -36,6 +61,16 @@ class ComposerHook
             "$appPath/bin",
             'console'
         );
+        @chmod("$appPath/bin/console", 0755);
+    }
+
+    /**
+     * Install web server.
+     */
+    public static function installWebServer()
+    {
+        $appPath = __DIR__ . '/../../../..';
+        self::createFolderIfNotExists("$appPath/web");
         self::createSoftLink(
             __DIR__,
             'app.php',
@@ -48,7 +83,6 @@ class ComposerHook
             "$appPath/web",
             'app_dev.php'
         );
-        @chmod("$appPath/bin/console", 0755);
     }
 
     /**
