@@ -29,7 +29,7 @@ use Apisearch\Socket\FiniteServer;
 \Symfony\Component\Debug\ErrorHandler::register();
 \Symfony\Component\Debug\ExceptionHandler::register();
 
-$oneBundleAppConfig = new \OneBundleApp\App\OneBundleAppConfig(__DIR__ . '/../', $environment);
+$oneBundleAppConfig = new \OneBundleApp\App\OneBundleAppConfig($appPath, $environment);
 $kernel = new \Mmoreram\BaseBundle\Kernel\BaseKernel(
     $oneBundleAppConfig->getBundles(),
     $oneBundleAppConfig->getConfig(),
