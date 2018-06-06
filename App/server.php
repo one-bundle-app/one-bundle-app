@@ -23,8 +23,8 @@ function error_to_exception($code, $message, $file, $line, $context) {
 set_error_handler( 'error_to_exception',  E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 
 $environment = 'prod';
-$appPath = __DIR__ . '/../../../..';
-require __DIR__ . '/autoload.php';
+$appPath = __DIR__ . '/..';
+require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 use Apisearch\Socket\FiniteServer;
 
 \Symfony\Component\Debug\ErrorHandler::register();

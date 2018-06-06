@@ -39,7 +39,7 @@ class ComposerHook
     {
         $appPath = __DIR__ . '/../../../..';
         self::createFolderIfNotExists("$appPath/bin");
-        self::createSoftLink(
+        self::createCopy(
             __DIR__,
             'server.php',
             "$appPath/bin",
@@ -55,7 +55,7 @@ class ComposerHook
     {
         $appPath = __DIR__ . '/../../../..';
         self::createFolderIfNotExists("$appPath/bin");
-        self::createSoftLink(
+        self::createCopy(
             __DIR__,
             'console.php',
             "$appPath/bin",
@@ -71,13 +71,13 @@ class ComposerHook
     {
         $appPath = __DIR__ . '/../../../..';
         self::createFolderIfNotExists("$appPath/web");
-        self::createSoftLink(
+        self::createCopy(
             __DIR__,
             'app.php',
             "$appPath/web",
             'app.php'
         );
-        self::createSoftLink(
+        self::createCopy(
             __DIR__,
             'app_dev.php',
             "$appPath/web",
@@ -98,29 +98,29 @@ class ComposerHook
     }
 
     /**
-     * Make a soft link of a file, from a folder, into a folder.
+     * Make a copy of a file, from a folder, into a folder.
      *
      * @param string $from
      * @param string $fromFilename
      * @param string $to
      * @param string $toFilename
      */
-    private static function createSoftLink(
+    private static function createCopy(
         string $from,
         string $fromFilename,
         string $to,
         string $toFilename
     ) {
         if (file_exists("$to/$toFilename")) {
-            @unlink("$to/$toFilename");
+            unlink("$to/$toFilename");
         }
 
-        symlink(
+        copy(
             realpath($from) . "/$fromFilename",
             realpath($to) . "/$toFilename"
         );
 
-        echo '> * Symlink origin - ' . realpath($from) . "/$toFilename" . PHP_EOL;
-        echo '> * Symlink destination - ' . realpath($to) . "/$toFilename" . PHP_EOL;
+        echo '> * Copy origin - ' . realpath($from) . "/$toFilename" . PHP_EOL;
+        echo '> * Copy destination - ' . realpath($to) . "/$toFilename" . PHP_EOL;
     }
 }

@@ -21,8 +21,8 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Debug;
 
 set_time_limit(0);
-$appPath = __DIR__ . '/../../../..';
-require __DIR__ . '/autoload.php';
+$appPath = __DIR__ . '/..';
+require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');
