@@ -45,7 +45,7 @@ class ComposerHook
             "$appPath/bin",
             'server'
         );
-        @chmod("$appPath/bin/server", 0755);
+        chmod("$appPath/bin/server", 0755);
     }
 
     /**
@@ -61,7 +61,7 @@ class ComposerHook
             "$appPath/bin",
             'console'
         );
-        @chmod("$appPath/bin/console", 0755);
+        chmod("$appPath/bin/console", 0755);
     }
 
     /**
@@ -116,8 +116,11 @@ class ComposerHook
         }
 
         symlink(
-            "$from/$fromFilename",
-            "$to/$toFilename"
+            realpath($from) . "/$fromFilename",
+            realpath($to) . "/$toFilename"
         );
+
+        echo '> * Symlink origin - ' . realpath($from) . "/$toFilename" . PHP_EOL;
+        echo '> * Symlink destination - ' . realpath($to) . "/$toFilename" . PHP_EOL;
     }
 }
