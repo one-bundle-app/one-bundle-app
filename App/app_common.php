@@ -21,7 +21,7 @@ use Dotenv\Dotenv;
 use Mmoreram\BaseBundle\Kernel\BaseKernel;
 use Symfony\Component\HttpFoundation\Request;
 
-$dotenv = new Dotenv(__DIR__);
+$dotenv = new Dotenv($appPath);
 $dotenv->load();
 
 $oneBundleAppConfig = new OneBundleAppConfig($appPath, $environment);

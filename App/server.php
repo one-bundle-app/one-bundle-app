@@ -28,7 +28,7 @@ require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 use Apisearch\Socket\FiniteServer;
 use Dotenv\Dotenv;
 
-$dotenv = new Dotenv(__DIR__);
+$dotenv = new Dotenv($appPath);
 $dotenv->load();
 
 \Symfony\Component\Debug\ErrorHandler::register();

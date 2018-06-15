@@ -25,7 +25,7 @@ set_time_limit(0);
 $appPath = __DIR__ . '/..';
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 
-$dotenv = new Dotenv(__DIR__);
+$dotenv = new Dotenv($appPath);
 $dotenv->load();
 
 $input = new ArgvInput();
