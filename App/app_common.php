@@ -17,12 +17,15 @@ declare(strict_types=1);
 
 namespace OneBundleApp\App;
 
-use Dotenv\Dotenv;
+use Symfony\Component\Dotenv\Dotenv;
 use Mmoreram\BaseBundle\Kernel\BaseKernel;
 use Symfony\Component\HttpFoundation\Request;
 
-$dotenv = new Dotenv($appPath);
-$dotenv->load();
+$envPath = $appPath . '/.env';
+if (file_exists($envPath)) {
+    $dotenv = new Dotenv();
+    $dotenv->load($envPath);
+}
 
 $oneBundleAppConfig = new OneBundleAppConfig($appPath, $environment);
 $kernel = new BaseKernel(

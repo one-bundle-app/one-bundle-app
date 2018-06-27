@@ -19,14 +19,17 @@ use OneBundleApp\App\OneBundleAppConfig;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Debug;
-use Dotenv\Dotenv;
+use Symfony\Component\Dotenv\Dotenv;
 
 set_time_limit(0);
 $appPath = __DIR__ . '/..';
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 
-$dotenv = new Dotenv($appPath);
-$dotenv->load();
+$envPath = $appPath . '/.env';
+if (file_exists($envPath)) {
+    $dotenv = new Dotenv();
+    $dotenv->load($envPath);
+}
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');

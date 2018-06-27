@@ -26,10 +26,13 @@ $environment = 'prod';
 $appPath = __DIR__ . '/..';
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 use Apisearch\Socket\FiniteServer;
-use Dotenv\Dotenv;
+use Symfony\Component\Dotenv\Dotenv;
 
-$dotenv = new Dotenv($appPath);
-$dotenv->load();
+$envPath = $appPath . '/.env';
+if (file_exists($envPath)) {
+    $dotenv = new Dotenv();
+    $dotenv->load($envPath);
+}
 
 \Symfony\Component\Debug\ErrorHandler::register();
 \Symfony\Component\Debug\ExceptionHandler::register();
