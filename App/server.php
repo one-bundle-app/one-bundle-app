@@ -56,15 +56,15 @@ $socket = new \React\Socket\Server($argv[1], $loop);
 $limitedServer = new FiniteServer($socket, $argv[2]);
 
 
-$http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel) {
-    return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel) {
+$http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent) {
+    return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent) {
 
         $body = '';
         $request->getBody()->on('data', function ($data) use (&$body) {
             $body .= $data;
         });
 
-        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel){
+        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel, $silent){
 
             try {
                 $from = microtime(true);
