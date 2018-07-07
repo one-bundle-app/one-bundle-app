@@ -24,6 +24,7 @@ set_error_handler( 'error_to_exception',  E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEP
 
 $environment = 'prod';
 $appPath = __DIR__ . '/..';
+$silent = in_array('--silent', $argv);
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 use Apisearch\Socket\FiniteServer;
 use Symfony\Component\Dotenv\Dotenv;
@@ -66,6 +67,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
         $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel){
 
             try {
+                $from = microtime(true);
                 $method = $request->getMethod();
                 $headers = $request->getHeaders();
                 $query = $request->getQueryParams();
@@ -101,6 +103,16 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                     $symfonyResponse->headers->all(),
                     $symfonyResponse->getContent()
                 );
+                $to = microtime(true);
+                if (!$silent) {
+                    echoRequestLine(
+                        $request->getUri()->getPath(),
+                        $method,
+                        $symfonyResponse->getStatusCode(),
+                        ($to - $from) * 1000
+                    );
+                }
+                
                 $symfonyRequest = null;
                 $symfonyResponse = null;
 
@@ -149,6 +161,28 @@ $loop->run();
 function echoException(\Exception $e)
 {
     echoLine("[{$e->getFile()}] [{$e->getCode()}] ::: [{$e->getMessage()}]");
+}
+
+/**
+ * Echo request line
+ *
+ * @param string $url
+ * @param string $method
+ * @param int $code
+ * @param int $elapsedTime
+ */
+function echoRequestLine(
+    string $url,
+    string $method,
+    int $code,
+    int $elapsedTime
+) {
+    $method = str_pad($method, 6, ' ');
+    echo $code === 200
+        ? "\033[01;32m".$code."\033[0m"
+        : "\033[01;31m".$code."\033[0m";
+    echo " $method $url ";
+    echo "(\e[00;37m".$elapsedTime." ms\e[0m)" . PHP_EOL;
 }
 
 /**
