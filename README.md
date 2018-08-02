@@ -203,3 +203,48 @@ executable.
 That should be enough. Then your bundle should be accessible both from console
 and the HTTP layer. Use an Apache or an Nginx, or even the command
 *bin/console server:run* without any extra configuration.
+
+## Using the server
+
+By using the ReactPHP Server, you'll be able to provide a nice endpoint by using
+a persistent Symfony kernel, always hosted in memory, and with all needed
+services already built.
+
+Make sure you have configured the project to have a server installed
+
+```json
+"scripts": {
+    "post-install-cmd": [
+        "OneBundleApp\\App\\ComposerHook::installReactServer",
+    ],
+}
+```
+
+After that, you'll be able to initialize the server by just doing
+
+```bash
+bin/server 0.0.0.0:8888
+```
+
+* The first mandatory parameter tells the host and endpoint you want to keep
+listening. `0.0.0.0` means localhost, but accessible from everywhere.
+* By default, the server is initialized with environment `prod`. You can change
+this behavior by using flags
+
+```bash
+bin/server 0.0.0.0:8888 --dev
+```
+
+* By default, the server is initialized with debug = `false`. You can change
+this behavior by using flags
+
+```bash
+bin/server 0.0.0.0:8888 --debug
+```
+
+* In development mode, you may like to work in development environment with
+debug. Then you can mix both flags :)
+
+```bash
+bin/server 0.0.0.0:8888 --dev --debug
+```
