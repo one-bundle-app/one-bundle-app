@@ -22,11 +22,12 @@ function error_to_exception($code, $message, $file, $line, $context) {
 }
 set_error_handler( 'error_to_exception',  E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 
-$environment = 'prod';
+$environment = in_array('--dev', $argv) ? 'dev' : 'prod';
 $appPath = __DIR__ . '/..';
 $silent = in_array('--silent', $argv);
+$debug = in_array('--debug', $argv);
+
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
-use Apisearch\Socket\FiniteServer;
 use Symfony\Component\Dotenv\Dotenv;
 
 $envPath = $appPath . '/.env';
@@ -44,7 +45,7 @@ $kernel = new \Mmoreram\BaseBundle\Kernel\BaseKernel(
     $oneBundleAppConfig->getConfig(),
     $oneBundleAppConfig->getRoutes(),
     $environment,
-    false,
+    $debug,
     $appPath . '/var'
 );
 
@@ -53,7 +54,6 @@ $kernel = new \Mmoreram\BaseBundle\Kernel\BaseKernel(
  */
 $loop = \React\EventLoop\Factory::create();
 $socket = new \React\Socket\Server($argv[1], $loop);
-$limitedServer = new FiniteServer($socket, $argv[2]);
 
 
 $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent) {
@@ -112,7 +112,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                         ($to - $from) * 1000
                     );
                 }
-                
+
                 $symfonyRequest = null;
                 $symfonyResponse = null;
 
@@ -144,7 +144,7 @@ $http->on('error', function(\Exception $e) {
     echoException($e);
 });
 
-$http->listen($limitedServer);
+$http->listen($socket);
 $loop->run();
 
 
