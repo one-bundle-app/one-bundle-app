@@ -109,6 +109,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                         $request->getUri()->getPath(),
                         $method,
                         $symfonyResponse->getStatusCode(),
+                        $symfonyResponse->getContent(),
                         ($to - $from) * 1000
                     );
                 }
@@ -169,20 +170,27 @@ function echoException(\Exception $e)
  * @param string $url
  * @param string $method
  * @param int $code
+ * @param string $message
  * @param int $elapsedTime
  */
 function echoRequestLine(
     string $url,
     string $method,
     int $code,
+    string $message,
     int $elapsedTime
 ) {
     $method = str_pad($method, 6, ' ');
+    $elapsedTime = str_pad($elapsedTime, 3, ' ', STR_PAD_LEFT);
     echo $code === 200
         ? "\033[01;32m".$code."\033[0m"
         : "\033[01;31m".$code."\033[0m";
     echo " $method $url ";
-    echo "(\e[00;37m".$elapsedTime." ms\e[0m)" . PHP_EOL;
+    echo "(\e[00;37m".$elapsedTime." ms\e[0m)";
+    if ($code !== 200) {
+        echo " - \e[00;37m".$message."\e[0m";
+    }
+    echo PHP_EOL;
 }
 
 /**
