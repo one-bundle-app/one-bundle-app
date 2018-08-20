@@ -182,12 +182,13 @@ function echoRequestLine(
 ) {
     $method = str_pad($method, 6, ' ');
     $elapsedTime = str_pad($elapsedTime, 3, ' ', STR_PAD_LEFT);
-    echo $code === 200
+    $isOK = ($code >= 200 && $code < 300);
+    echo $isOK
         ? "\033[01;32m".$code."\033[0m"
         : "\033[01;31m".$code."\033[0m";
     echo " $method $url ";
     echo "(\e[00;37m".$elapsedTime." ms\e[0m)";
-    if ($code !== 200) {
+    if (!$isOK) {
         echo " - \e[00;37m".$message."\e[0m";
     }
     echo PHP_EOL;
