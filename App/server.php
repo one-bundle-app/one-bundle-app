@@ -26,6 +26,7 @@ $environment = in_array('--dev', $argv) ? 'dev' : 'prod';
 $appPath = __DIR__ . '/..';
 $silent = in_array('--silent', $argv);
 $debug = in_array('--debug', $argv);
+$api = in_array('--api', $argv);
 
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 use Symfony\Component\Dotenv\Dotenv;
@@ -56,15 +57,22 @@ $loop = \React\EventLoop\Factory::create();
 $socket = new \React\Socket\Server($argv[1], $loop);
 
 
-$http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent) {
-    return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent) {
+$http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent, $api) {
+    return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent, $api) {
 
         $body = '';
         $request->getBody()->on('data', function ($data) use (&$body) {
             $body .= $data;
         });
 
-        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel, $silent){
+        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel, $silent, $api){
+
+            if ($api) {
+                if ('/favicon.ico' === (string) $request->getUri()->getPath()) {
+                    $resolve(createFaviconResponse());
+                    return;
+                }
+            }
 
             try {
                 $from = microtime(true);
@@ -181,7 +189,6 @@ function echoRequestLine(
     int $elapsedTime
 ) {
     $method = str_pad($method, 6, ' ');
-    $elapsedTime = str_pad($elapsedTime, 3, ' ', STR_PAD_LEFT);
     $isOK = ($code >= 200 && $code < 300);
     echo $isOK
         ? "\033[01;32m".$code."\033[0m"
@@ -189,9 +196,30 @@ function echoRequestLine(
     echo " $method $url ";
     echo "(\e[00;37m".$elapsedTime." ms\e[0m)";
     if (!$isOK) {
-        echo " - \e[00;37m".$message."\e[0m";
+        echo " - \e[00;37m".messageInMessage($message)."\e[0m";
     }
     echo PHP_EOL;
+}
+
+/**
+ * Find message
+ *
+ * @param string $message
+ *
+ * @return string
+ */
+function messageInMessage(string $message) : string
+{
+    $decodedMessage = json_decode($message, true);
+    if (
+        is_array($decodedMessage) &&
+        isset($decodedMessage['message']) &&
+        is_string($decodedMessage['message'])
+    ) {
+        return $decodedMessage['message'];
+    }
+
+    return $message;
 }
 
 /**
@@ -201,4 +229,23 @@ function echoRequestLine(
  */
 function echoLine(string $line) {
     echo($line) . PHP_EOL;
+}
+
+/**
+ * Echo favicon
+ *
+ * @return \React\Http\Response
+ */
+function createFaviconResponse()
+{
+    return new \React\Http\Response(
+        200,
+        [
+            'cache-control' => 'max-age=31556926, public, s-maxage=31556926',
+            'access-control-allow-origin' => '*',
+            'Content-Type' => 'image/ico',
+            'Content-Length' => 0
+        ],
+        ''
+    );
 }
