@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace OneBundleApp\App;
 
-use Symfony\Component\Dotenv\Dotenv;
 use Mmoreram\BaseBundle\Kernel\BaseKernel;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 
 $envPath = $appPath . '/.env';

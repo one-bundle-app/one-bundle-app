@@ -15,12 +15,13 @@
  */
 
 /**
- * Errors to Exceptions
+ * Errors to Exceptions.
  */
-function error_to_exception($code, $message, $file, $line, $context) {
+function error_to_exception($code, $message, $file, $line, $context)
+{
     throw new \Exception($message, $code);
 }
-set_error_handler( 'error_to_exception',  E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+set_error_handler('error_to_exception',  E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 
 $environment = in_array('--dev', $argv) ? 'dev' : 'prod';
 $appPath = __DIR__ . '/..';
@@ -29,6 +30,7 @@ $debug = in_array('--debug', $argv);
 $api = in_array('--api', $argv);
 
 require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
+
 use Symfony\Component\Dotenv\Dotenv;
 
 $envPath = $appPath . '/.env';
@@ -51,25 +53,23 @@ $kernel = new \Mmoreram\BaseBundle\Kernel\BaseKernel(
 );
 
 /**
- * REACT SERVER
+ * REACT SERVER.
  */
 $loop = \React\EventLoop\Factory::create();
 $socket = new \React\Socket\Server($argv[1], $loop);
 
-
 $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent, $api) {
     return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent, $api) {
-
         $body = '';
         $request->getBody()->on('data', function ($data) use (&$body) {
             $body .= $data;
         });
 
-        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel, $silent, $api){
-
+        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel, $silent, $api) {
             if ($api) {
                 if ('/favicon.ico' === (string) $request->getUri()->getPath()) {
                     $resolve(createFaviconResponse());
+
                     return;
                 }
             }
@@ -79,7 +79,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                 $method = $request->getMethod();
                 $headers = $request->getHeaders();
                 $query = $request->getQueryParams();
-                $post = array();
+                $post = [];
                 if (!empty($body)) {
                     parse_str($body, $post);
                     $post = is_array($post)
@@ -93,7 +93,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                     $request->getAttributes(),
                     $request->getCookieParams(),
                     $request->getUploadedFiles(),
-                    array(), // Server is partially filled a few lines below
+                    [], // Server is partially filled a few lines below
                     $body
                 );
 
@@ -126,10 +126,9 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                 $symfonyResponse = null;
 
                 /**
-                 * Catching errors and sending to syslog
+                 * Catching errors and sending to syslog.
                  */
             } catch (\Exception $e) {
-
                 echoException($e);
                 throw $e;
             }
@@ -137,33 +136,31 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
             $resolve($httpResponse);
         });
 
-        $request->getBody()->on('error', function (Exception $e) use ($resolve){
+        $request->getBody()->on('error', function (Exception $e) use ($resolve) {
             echoException($e);
             $response = new \React\Http\Response(
                 400,
-                array('Content-Type' => 'text/plain'),
-                "An error occured while reading from stream"
+                ['Content-Type' => 'text/plain'],
+                'An error occured while reading from stream'
             );
             $resolve($response);
         });
     });
 });
 
-$http->on('error', function(\Exception $e) {
+$http->on('error', function (\Exception $e) {
     echoException($e);
 });
 
 $http->listen($socket);
 $loop->run();
 
-
-
 /**
- * Common functions
+ * Common functions.
  */
 
 /**
- * Send to syslog
+ * Send to syslog.
  *
  * @param \Exception $e
  */
@@ -173,13 +170,13 @@ function echoException(\Exception $e)
 }
 
 /**
- * Echo request line
+ * Echo request line.
  *
  * @param string $url
  * @param string $method
- * @param int $code
+ * @param int    $code
  * @param string $message
- * @param int $elapsedTime
+ * @param int    $elapsedTime
  */
 function echoRequestLine(
     string $url,
@@ -191,18 +188,18 @@ function echoRequestLine(
     $method = str_pad($method, 6, ' ');
     $isOK = ($code >= 200 && $code < 300);
     echo $isOK
-        ? "\033[01;32m".$code."\033[0m"
-        : "\033[01;31m".$code."\033[0m";
+        ? "\033[01;32m" . $code . "\033[0m"
+        : "\033[01;31m" . $code . "\033[0m";
     echo " $method $url ";
-    echo "(\e[00;37m".$elapsedTime." ms\e[0m)";
+    echo "(\e[00;37m" . $elapsedTime . ' ms | ' . ((int) (memory_get_usage() / 1000000)) . " MB\e[0m)";
     if (!$isOK) {
-        echo " - \e[00;37m".messageInMessage($message)."\e[0m";
+        echo " - \e[00;37m" . messageInMessage($message) . "\e[0m";
     }
     echo PHP_EOL;
 }
 
 /**
- * Find message
+ * Find message.
  *
  * @param string $message
  *
@@ -223,16 +220,17 @@ function messageInMessage(string $message) : string
 }
 
 /**
- * Send to syslog
+ * Send to syslog.
  *
  * @param string $line
  */
-function echoLine(string $line) {
+function echoLine(string $line)
+{
     echo($line) . PHP_EOL;
 }
 
 /**
- * Echo favicon
+ * Echo favicon.
  *
  * @return \React\Http\Response
  */
@@ -244,7 +242,7 @@ function createFaviconResponse()
             'cache-control' => 'max-age=31556926, public, s-maxage=31556926',
             'access-control-allow-origin' => '*',
             'Content-Type' => 'image/ico',
-            'Content-Length' => 0
+            'Content-Length' => 0,
         ],
         ''
     );
