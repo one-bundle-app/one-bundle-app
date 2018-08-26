@@ -19,7 +19,7 @@ namespace OneBundleApp\App;
 
 use Symfony\Component\Debug\Debug;
 
-$appPath = __DIR__ . '/../../../..';
+$appPath = __DIR__ . '/..';
 $environment = 'dev';
 $debug = true;
 
@@ -31,7 +31,6 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
     exit('You are not allowed to access this file. Check ' . basename(__FILE__) . ' for more information.');
 }
 
-require __DIR__ . '/autoload.php';
+require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 Debug::enable();
-
-require 'app_common.php';
+require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/app_common.php';

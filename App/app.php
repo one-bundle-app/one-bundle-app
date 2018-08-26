@@ -17,13 +17,8 @@ declare(strict_types=1);
 
 namespace OneBundleApp\App;
 
-$appPath = __DIR__ . '/../../../..';
+$appPath = __DIR__ . '/..';
 $environment = 'prod';
 $debug = false;
-require __DIR__ . '/autoload.php';
-
-if (PHP_VERSION_ID < 70000) {
-    include_once $appPath . '/var/bootstrap.php.cache';
-}
-
-require 'app_common.php';
+require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
+require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/app_common.php';
