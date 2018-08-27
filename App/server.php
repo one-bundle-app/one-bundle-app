@@ -186,13 +186,17 @@ function echoRequestLine(
     int $elapsedTime
 ) {
     $method = str_pad($method, 6, ' ');
-    $isOK = ($code >= 200 && $code < 300);
-    echo $isOK
-        ? "\033[01;32m" . $code . "\033[0m"
-        : "\033[01;31m" . $code . "\033[0m";
+    $color = '32';
+    if ($code >= 300 && $code < 400) {
+        $color = '33';
+    } elseif ($code >= 400) {
+        $color = '31';
+    }
+
+    echo "\033[01;{$color}m" . $code . "\033[0m";
     echo " $method $url ";
     echo "(\e[00;37m" . $elapsedTime . ' ms | ' . ((int) (memory_get_usage() / 1000000)) . " MB\e[0m)";
-    if (!$isOK) {
+    if ($code >= 300) {
         echo " - \e[00;37m" . messageInMessage($message) . "\e[0m";
     }
     echo PHP_EOL;
