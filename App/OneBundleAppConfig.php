@@ -54,7 +54,7 @@ class OneBundleAppConfig
      */
     public function __construct(string $appPath, string $environment)
     {
-        $configFromYml = array_merge(
+        $configFromYml = array_replace_recursive(
             $this->loadConfigDataFromYmlFilepath("$appPath/app.yml"),
             $this->loadConfigDataFromYmlFilepath("$appPath/app_$environment.yml")
         );
