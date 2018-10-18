@@ -30,7 +30,7 @@
         "symfony/yaml": "^3.0|^4.0",
         "symfony/dotenv": "^3.0|^4.0",
         "mmoreram/symfony-bundle-dependencies": "^2.0",
-        "react/http": "0.7.4",
+        "react/http": "^0.7.4",
         "cboden/ratchet": "^0.4",
         "clue/redis-react": "^2.2"
     },
