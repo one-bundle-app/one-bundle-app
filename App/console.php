@@ -14,39 +14,27 @@
  * @author Marc Morera <yuhu@mmoreram.com>
  */
 
-use Mmoreram\BaseBundle\Tests\BaseKernel;
-use OneBundleApp\App\OneBundleAppConfig;
+use OneBundleApp\App\AppFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Debug\Debug;
-use Symfony\Component\Dotenv\Dotenv;
 
 set_time_limit(0);
-$appPath = __DIR__ . '/..';
-require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
-
-$envPath = $appPath . '/.env';
-if (file_exists($envPath)) {
-    $dotenv = new Dotenv();
-    $dotenv->load($envPath);
-}
+$appPath = __DIR__.'/..';
+require __DIR__.'/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 
 $input = new ArgvInput();
-$env = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');
-$debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(['--no-debug', '']) && $env !== 'prod';
+$environment = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');
+$debug = '0' !== getenv('SYMFONY_DEBUG') && !$input->hasParameterOption(['--no-debug', '']) && 'prod' !== $environment;
 
 if ($debug) {
     Debug::enable();
 }
 
-$oneBundleAppConfig = new OneBundleAppConfig($appPath, $env);
-$kernel = new BaseKernel(
-    $oneBundleAppConfig->getBundles(),
-    $oneBundleAppConfig->getConfig(),
-    $oneBundleAppConfig->getRoutes(),
-    $env,
-    $debug,
-    $appPath . '/var'
+$kernel = AppFactory::createApp(
+    $appPath,
+    $environment,
+    $debug
 );
 
 $application = new Application($kernel);

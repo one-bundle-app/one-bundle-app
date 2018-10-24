@@ -88,7 +88,7 @@ class OneBundleAppConfig
      *
      * @return array
      */
-    public function getBundles() : array
+    public function getBundles(): array
     {
         return $this->bundles;
     }
@@ -98,7 +98,7 @@ class OneBundleAppConfig
      *
      * @return array
      */
-    public function getConfig() : array
+    public function getConfig(): array
     {
         return $this->config;
     }
@@ -108,7 +108,7 @@ class OneBundleAppConfig
      *
      * @return array
      */
-    public function getRoutes() : array
+    public function getRoutes(): array
     {
         return $this->routes;
     }
