@@ -44,72 +44,86 @@ $socket = new \React\Socket\Server($argv[1], $loop);
 
 $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent, $api) {
     return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent, $api) {
-        $body = $request->getBody()->getContents();
-        if ($api) {
-            if ('/favicon.ico' === (string) $request->getUri()->getPath()) {
-                $resolve(createFaviconResponse());
-
-                return;
-            }
-        }
-
         try {
-            $from = microtime(true);
-            $method = $request->getMethod();
-            $headers = $request->getHeaders();
-            $query = $request->getQueryParams();
-            $post = [];
-            if (!empty($body)) {
-                parse_str($body, $post);
-                $post = is_array($post)
-                    ? $post
-                    : [];
+            $body = $request->getBody()->getContents();
+
+            if ($api) {
+                if ('/favicon.ico' === (string) $request->getUri()->getPath()) {
+                    $resolve(createFaviconResponse());
+
+                    return;
+                }
             }
 
-            $symfonyRequest = new \Symfony\Component\HttpFoundation\Request(
-                $query,
-                $post,
-                $request->getAttributes(),
-                $request->getCookieParams(),
-                $request->getUploadedFiles(),
-                [], // Server is partially filled a few lines below
-                $body
-            );
+            try {
+                $from = microtime(true);
+                $method = $request->getMethod();
+                $headers = $request->getHeaders();
+                $query = $request->getQueryParams();
+                $post = [];
+                if (!empty($body)) {
+                    parse_str($body, $post);
+                    $post = is_array($post)
+                        ? $post
+                        : [];
+                }
 
-            $symfonyRequest->setMethod($method);
-            $symfonyRequest->headers->replace($headers);
-            $symfonyRequest->server->set('REQUEST_URI', $request->getUri());
-            if (isset($headers['Host'])) {
-                $symfonyRequest->server->set('SERVER_NAME', explode(':', $headers['Host'][0]));
-            }
+                $symfonyRequest = new \Symfony\Component\HttpFoundation\Request(
+                    $query,
+                    $post,
+                    $request->getAttributes(),
+                    $request->getCookieParams(),
+                    $request->getUploadedFiles(),
+                    [], // Server is partially filled a few lines below
+                    $body
+                );
 
-            $symfonyResponse = $kernel->handle($symfonyRequest);
-            $kernel->terminate($symfonyRequest, $symfonyResponse);
-            $httpResponse = new \React\Http\Response(
-                $symfonyResponse->getStatusCode(),
-                $symfonyResponse->headers->all(),
-                $symfonyResponse->getContent()
-            );
-            $to = microtime(true);
-            if (!$silent) {
-                echoRequestLine(
-                    $request->getUri()->getPath(),
-                    $method,
+                $symfonyRequest->setMethod($method);
+                $symfonyRequest->headers->replace($headers);
+                $symfonyRequest->server->set('REQUEST_URI', $request->getUri());
+                if (isset($headers['Host'])) {
+                    $symfonyRequest->server->set('SERVER_NAME', explode(':', $headers['Host'][0]));
+                }
+
+                $symfonyResponse = $kernel->handle($symfonyRequest);
+                $kernel->terminate($symfonyRequest, $symfonyResponse);
+                $httpResponse = new \React\Http\Response(
                     $symfonyResponse->getStatusCode(),
-                    $symfonyResponse->getContent(),
-                    ($to - $from) * 1000
+                    $symfonyResponse->headers->all(),
+                    $symfonyResponse->getContent()
+                );
+                $to = microtime(true);
+                if (!$silent) {
+                    echoRequestLine(
+                        $request->getUri()->getPath(),
+                        $method,
+                        $symfonyResponse->getStatusCode(),
+                        $symfonyResponse->getContent(),
+                        ($to - $from) * 1000
+                    );
+                }
+
+                $symfonyRequest = null;
+                $symfonyResponse = null;
+
+                /*
+                 * Catching errors and sending to syslog.
+                 */
+            } catch (\Exception $exception) {
+                echoException($exception);
+                $httpResponse = new \React\Http\Response(
+                    400,
+                    ['Content-Type' => 'text/plain'],
+                    $exception->getMessage()
                 );
             }
-
-            $symfonyRequest = null;
-            $symfonyResponse = null;
-
-            /*
-             * Catching errors and sending to syslog.
-             */
-        } catch (\Exception $e) {
-            echoException($e);
-            throw $e;
+        } catch (\RuntimeException $runtimeException) {
+            echoException($runtimeException);
+            $httpResponse = new \React\Http\Response(
+                400,
+                ['Content-Type' => 'text/plain'],
+                'An error occured while reading from stream'
+            );
         }
 
         $resolve($httpResponse);
