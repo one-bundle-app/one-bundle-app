@@ -21,35 +21,19 @@ function error_to_exception($code, $message, $file, $line, $context)
 {
     throw new \Exception($message, $code);
 }
-set_error_handler('error_to_exception',  E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+set_error_handler('error_to_exception', E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 
 $environment = in_array('--dev', $argv) ? 'dev' : 'prod';
-$appPath = __DIR__ . '/..';
+$appPath = __DIR__.'/..';
 $silent = in_array('--silent', $argv);
 $debug = in_array('--debug', $argv);
 $api = in_array('--api', $argv);
 
-require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
-
-use Symfony\Component\Dotenv\Dotenv;
-
-$envPath = $appPath . '/.env';
-if (file_exists($envPath)) {
-    $dotenv = new Dotenv();
-    $dotenv->load($envPath);
-}
-
-\Symfony\Component\Debug\ErrorHandler::register();
-\Symfony\Component\Debug\ExceptionHandler::register();
-
-$oneBundleAppConfig = new \OneBundleApp\App\OneBundleAppConfig($appPath, $environment);
-$kernel = new \Mmoreram\BaseBundle\Kernel\BaseKernel(
-    $oneBundleAppConfig->getBundles(),
-    $oneBundleAppConfig->getConfig(),
-    $oneBundleAppConfig->getRoutes(),
+require __DIR__.'/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
+$kernel = \OneBundleApp\App\AppFactory::createApp(
+    $appPath,
     $environment,
-    $debug,
-    $appPath . '/var'
+    $debug
 );
 
 /**
@@ -60,12 +44,9 @@ $socket = new \React\Socket\Server($argv[1], $loop);
 
 $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) use ($kernel, $silent, $api) {
     return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent, $api) {
-        $body = '';
-        $request->getBody()->on('data', function ($data) use (&$body) {
-            $body .= $data;
-        });
+        try {
+            $body = $request->getBody()->getContents();
 
-        $request->getBody()->on('end', function () use ($resolve, &$body, $request, $kernel, $silent, $api) {
             if ($api) {
                 if ('/favicon.ico' === (string) $request->getUri()->getPath()) {
                     $resolve(createFaviconResponse());
@@ -125,26 +106,27 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                 $symfonyRequest = null;
                 $symfonyResponse = null;
 
-                /**
+                /*
                  * Catching errors and sending to syslog.
                  */
-            } catch (\Exception $e) {
-                echoException($e);
-                throw $e;
+            } catch (\Exception $exception) {
+                echoException($exception);
+                $httpResponse = new \React\Http\Response(
+                    400,
+                    ['Content-Type' => 'text/plain'],
+                    $exception->getMessage()
+                );
             }
-
-            $resolve($httpResponse);
-        });
-
-        $request->getBody()->on('error', function (Exception $e) use ($resolve) {
-            echoException($e);
-            $response = new \React\Http\Response(
+        } catch (\RuntimeException $runtimeException) {
+            echoException($runtimeException);
+            $httpResponse = new \React\Http\Response(
                 400,
                 ['Content-Type' => 'text/plain'],
                 'An error occured while reading from stream'
             );
-            $resolve($response);
-        });
+        }
+
+        $resolve($httpResponse);
     });
 });
 
@@ -193,11 +175,11 @@ function echoRequestLine(
         $color = '31';
     }
 
-    echo "\033[01;{$color}m" . $code . "\033[0m";
+    echo "\033[01;{$color}m".$code."\033[0m";
     echo " $method $url ";
-    echo "(\e[00;37m" . $elapsedTime . ' ms | ' . ((int) (memory_get_usage() / 1000000)) . " MB\e[0m)";
+    echo "(\e[00;37m".$elapsedTime.' ms | '.((int) (memory_get_usage() / 1000000))." MB\e[0m)";
     if ($code >= 300) {
-        echo " - \e[00;37m" . messageInMessage($message) . "\e[0m";
+        echo " - \e[00;37m".messageInMessage($message)."\e[0m";
     }
     echo PHP_EOL;
 }
@@ -209,7 +191,7 @@ function echoRequestLine(
  *
  * @return string
  */
-function messageInMessage(string $message) : string
+function messageInMessage(string $message): string
 {
     $decodedMessage = json_decode($message, true);
     if (
@@ -230,7 +212,7 @@ function messageInMessage(string $message) : string
  */
 function echoLine(string $line)
 {
-    echo($line) . PHP_EOL;
+    echo($line).PHP_EOL;
 }
 
 /**

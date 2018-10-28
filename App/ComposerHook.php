@@ -37,7 +37,7 @@ class ComposerHook
      */
     public static function installReactServer()
     {
-        $appPath = __DIR__ . '/../../../..';
+        $appPath = __DIR__.'/../../../..';
         self::createFolderIfNotExists("$appPath/bin");
         self::createCopy(
             __DIR__,
@@ -53,7 +53,7 @@ class ComposerHook
      */
     public static function installConsole()
     {
-        $appPath = __DIR__ . '/../../../..';
+        $appPath = __DIR__.'/../../../..';
         self::createFolderIfNotExists("$appPath/bin");
         self::createCopy(
             __DIR__,
@@ -69,7 +69,7 @@ class ComposerHook
      */
     public static function installWebServer()
     {
-        $appPath = __DIR__ . '/../../../..';
+        $appPath = __DIR__.'/../../../..';
         self::createFolderIfNotExists("$appPath/web");
         self::createCopy(
             __DIR__,
@@ -116,11 +116,11 @@ class ComposerHook
         }
 
         copy(
-            realpath($from) . "/$fromFilename",
-            realpath($to) . "/$toFilename"
+            realpath($from)."/$fromFilename",
+            realpath($to)."/$toFilename"
         );
 
-        echo '> * Copy origin - ' . realpath($from) . "/$toFilename" . PHP_EOL;
-        echo '> * Copy destination - ' . realpath($to) . "/$toFilename" . PHP_EOL;
+        echo '> * Copy origin - '.realpath($from)."/$toFilename".PHP_EOL;
+        echo '> * Copy destination - '.realpath($to)."/$toFilename".PHP_EOL;
     }
 }

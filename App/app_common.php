@@ -17,28 +17,13 @@ declare(strict_types=1);
 
 namespace OneBundleApp\App;
 
-use Mmoreram\BaseBundle\Kernel\BaseKernel;
-use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 
-$envPath = $appPath . '/.env';
-if (file_exists($envPath)) {
-    $dotenv = new Dotenv();
-    $dotenv->load($envPath);
-}
-
-$oneBundleAppConfig = new OneBundleAppConfig($appPath, $environment);
-$kernel = new BaseKernel(
-    $oneBundleAppConfig->getBundles(),
-    $oneBundleAppConfig->getConfig(),
-    $oneBundleAppConfig->getRoutes(),
-    $environment, $debug,
-    $appPath . '/var'
+$kernel = AppFactory::createApp(
+    $appPath,
+    $environment,
+    $debug
 );
-
-if (PHP_VERSION_ID < 70000) {
-    $kernel->loadClassCache();
-}
 
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);

@@ -19,18 +19,18 @@ namespace OneBundleApp\App;
 
 use Symfony\Component\Debug\Debug;
 
-$appPath = __DIR__ . '/..';
+$appPath = __DIR__.'/..';
 $environment = 'dev';
 $debug = true;
 
 if (isset($_SERVER['HTTP_CLIENT_IP'])
     || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-    || !(in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || php_sapi_name() === 'cli-server')
+    || !(in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || 'cli-server' === php_sapi_name())
 ) {
     header('HTTP/1.0 403 Forbidden');
-    exit('You are not allowed to access this file. Check ' . basename(__FILE__) . ' for more information.');
+    exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
 }
 
-require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
+require __DIR__.'/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
 Debug::enable();
-require __DIR__ . '/../vendor/one-bundle-app/one-bundle-app/App/app_common.php';
+require __DIR__.'/../vendor/one-bundle-app/one-bundle-app/App/app_common.php';

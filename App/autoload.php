@@ -19,9 +19,9 @@ use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
 /**
- * @var ClassLoader $loader
+ * @var ClassLoader
  */
-$loader = require $appPath . '/vendor/autoload.php';
+$loader = require $appPath.'/vendor/autoload.php';
 
 if (class_exists(AnnotationRegistry::class)) {
     AnnotationRegistry::registerLoader([$loader, 'loadClass']);
