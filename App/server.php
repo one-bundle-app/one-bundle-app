@@ -55,74 +55,65 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
                 }
             }
 
-            try {
-                $from = microtime(true);
-                $method = $request->getMethod();
-                $headers = $request->getHeaders();
-                $query = $request->getQueryParams();
-                $post = [];
-                if (!empty($body)) {
-                    parse_str($body, $post);
-                    $post = is_array($post)
-                        ? $post
-                        : [];
-                }
+            $from = microtime(true);
+            $method = $request->getMethod();
+            $headers = $request->getHeaders();
+            $query = $request->getQueryParams();
+            $post = [];
+            if (!empty($body)) {
+                parse_str($body, $post);
+                $post = is_array($post)
+                    ? $post
+                    : [];
+            }
 
-                $symfonyRequest = new \Symfony\Component\HttpFoundation\Request(
-                    $query,
-                    $post,
-                    $request->getAttributes(),
-                    $request->getCookieParams(),
-                    $request->getUploadedFiles(),
-                    [], // Server is partially filled a few lines below
-                    $body
-                );
+            $symfonyRequest = new \Symfony\Component\HttpFoundation\Request(
+                $query,
+                $post,
+                $request->getAttributes(),
+                $request->getCookieParams(),
+                $request->getUploadedFiles(),
+                [], // Server is partially filled a few lines below
+                $body
+            );
 
-                $symfonyRequest->setMethod($method);
-                $symfonyRequest->headers->replace($headers);
-                $symfonyRequest->server->set('REQUEST_URI', $request->getUri());
-                if (isset($headers['Host'])) {
-                    $symfonyRequest->server->set('SERVER_NAME', explode(':', $headers['Host'][0]));
-                }
+            $symfonyRequest->setMethod($method);
+            $symfonyRequest->headers->replace($headers);
+            $symfonyRequest->server->set('REQUEST_URI', $request->getUri());
+            if (isset($headers['Host'])) {
+                $symfonyRequest->server->set('SERVER_NAME', explode(':', $headers['Host'][0]));
+            }
 
-                $symfonyResponse = $kernel->handle($symfonyRequest);
-                $kernel->terminate($symfonyRequest, $symfonyResponse);
-                $httpResponse = new \React\Http\Response(
+            $symfonyResponse = $kernel->handle($symfonyRequest);
+            $kernel->terminate($symfonyRequest, $symfonyResponse);
+            $httpResponse = new \React\Http\Response(
+                $symfonyResponse->getStatusCode(),
+                $symfonyResponse->headers->all(),
+                $symfonyResponse->getContent()
+            );
+            $to = microtime(true);
+            if (!$silent) {
+                echoRequestLine(
+                    $request->getUri()->getPath(),
+                    $method,
                     $symfonyResponse->getStatusCode(),
-                    $symfonyResponse->headers->all(),
-                    $symfonyResponse->getContent()
-                );
-                $to = microtime(true);
-                if (!$silent) {
-                    echoRequestLine(
-                        $request->getUri()->getPath(),
-                        $method,
-                        $symfonyResponse->getStatusCode(),
-                        $symfonyResponse->getContent(),
-                        ($to - $from) * 1000
-                    );
-                }
-
-                $symfonyRequest = null;
-                $symfonyResponse = null;
-
-                /*
-                 * Catching errors and sending to syslog.
-                 */
-            } catch (\Exception $exception) {
-                echoException($exception);
-                $httpResponse = new \React\Http\Response(
-                    400,
-                    ['Content-Type' => 'text/plain'],
-                    $exception->getMessage()
+                    $symfonyResponse->getContent(),
+                    ($to - $from) * 1000
                 );
             }
-        } catch (\RuntimeException $runtimeException) {
-            echoException($runtimeException);
+
+            $symfonyRequest = null;
+            $symfonyResponse = null;
+
+            /*
+             * Catching errors and sending to syslog.
+             */
+        } catch (\Throwable $exception) {
+            echoException($exception);
             $httpResponse = new \React\Http\Response(
                 400,
                 ['Content-Type' => 'text/plain'],
-                'An error occured while reading from stream'
+                $exception->getMessage()
             );
         }
 
@@ -130,7 +121,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
     });
 });
 
-$http->on('error', function (\Exception $e) {
+$http->on('error', function (\Throwable $e) {
     echoException($e);
 });
 
@@ -144,9 +135,9 @@ $loop->run();
 /**
  * Send to syslog.
  *
- * @param \Exception $e
+ * @param \Throwable $e
  */
-function echoException(\Exception $e)
+function echoException(\Throwable $e)
 {
     echoLine("[{$e->getFile()}] [{$e->getCode()}] ::: [{$e->getMessage()}]");
 }
