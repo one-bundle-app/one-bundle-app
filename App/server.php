@@ -46,9 +46,10 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
     return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $kernel, $silent, $api) {
         try {
             $body = $request->getBody()->getContents();
+            $uriPath = $request->getUri()->getPath();
 
             if ($api) {
-                if ('/favicon.ico' === (string) $request->getUri()->getPath()) {
+                if ('/favicon.ico' === $uriPath) {
                     $resolve(createFaviconResponse());
 
                     return;
@@ -79,7 +80,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
 
             $symfonyRequest->setMethod($method);
             $symfonyRequest->headers->replace($headers);
-            $symfonyRequest->server->set('REQUEST_URI', $request->getUri());
+            $symfonyRequest->server->set('REQUEST_URI', $uriPath);
             if (isset($headers['Host'])) {
                 $symfonyRequest->server->set('SERVER_NAME', explode(':', $headers['Host'][0]));
             }
