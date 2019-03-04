@@ -108,7 +108,7 @@ class RequestHandler
                 $method,
                 $symfonyResponse->getStatusCode(),
                 $symfonyResponse->getContent(),
-                ($to - $from) * 1000
+                \intval(($to - $from) * 1000)
             );
 
             $symfonyRequest = null;
