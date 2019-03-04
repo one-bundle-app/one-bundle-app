@@ -57,7 +57,7 @@ class Adapter implements BootstrapInterface, ApplicationEnvironmentAwareInterfac
     public function getApplication()
     {
         $kernel = AppFactory::createApp(
-             __DIR__.'/../../../..',
+            __DIR__.'/../../../..',
             $this->environment,
             $this->debug
         );
