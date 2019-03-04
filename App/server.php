@@ -14,21 +14,13 @@
  * @author Marc Morera <yuhu@mmoreram.com>
  */
 
-/**
- * Errors to Exceptions.
- */
-function error_to_exception($code, $message, $file, $line, $context)
-{
-    throw new \Exception($message, $code);
-}
-set_error_handler('error_to_exception', E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-
 $environment = in_array('--dev', $argv) ? 'dev' : 'prod';
 $appPath = __DIR__.'/..';
 $silent = in_array('--silent', $argv);
 $debug = in_array('--debug', $argv);
 
 require __DIR__.'/../vendor/one-bundle-app/one-bundle-app/App/autoload.php';
+\OneBundleApp\App\ErrorHandler::handle();
 $kernel = \OneBundleApp\App\AppFactory::createApp(
     $appPath,
     $environment,
@@ -46,7 +38,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
     return new \React\Promise\Promise(function ($resolve, $reject) use ($request, $requestHandler, $silent) {
         list($httpResponse, $messages) = $requestHandler->handleServerRequest($request);
 
-        if ($silent) {
+        if (!$silent) {
             foreach ($messages as $message) {
                 $message->print();
             }
@@ -57,7 +49,7 @@ $http = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterfac
 });
 
 $http->on('error', function (\Throwable $e) {
-    echoException($e);
+    (new \OneBundleApp\App\ConsoleException($e))->print();
 });
 
 $http->listen($socket);
