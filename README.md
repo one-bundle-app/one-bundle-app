@@ -204,7 +204,7 @@ That should be enough. Then your bundle should be accessible both from console
 and the HTTP layer. Use an Apache or an Nginx, or even the command
 *bin/console server:run* without any extra configuration.
 
-## Using the server
+## Using the ReactPHP Server
 
 By using the ReactPHP Server, you'll be able to provide a nice endpoint by using
 a persistent Symfony kernel, always hosted in memory, and with all needed
@@ -247,4 +247,23 @@ debug. Then you can mix both flags :)
 
 ```bash
 bin/server 0.0.0.0:8888 --dev --debug
+```
+
+## Using the PPM Server
+
+You can use as well the PPM server if you need to have a little bit more
+workers availability (for example if you have some long-term processes mixed
+with short-term processes).
+
+You can check [PHP PM Project](https://github.com/php-pm) documentation of how
+to start the server. This repository has specific bridge and adapter classes to
+work properly and only with this integration.
+
+```bash
+vendor/bin/ppm start --host=0.0.0.0 --port=8888 \
+    --workers=3 \
+    --bootstrap=OneBundleApp\\PPM\\Adapter \
+    --bridge=OneBundleApp\\PPM\\Bridge \
+    --app-env=prod \
+    --debug=0 --logging=0
 ```

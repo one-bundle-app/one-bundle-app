@@ -33,8 +33,7 @@
         "react/http": "^0.8",
         "cboden/ratchet": "^0.4",
         "clue/redis-react": "^2.2",
-        "php-pm/php-pm": "^1",
-        "php-pm/httpkernel-adapter": "^1"
+        "php-pm/php-pm": "^1"
     },
     "require-dev": {
         "mmoreram/php-formatter": "^1.3.1",
