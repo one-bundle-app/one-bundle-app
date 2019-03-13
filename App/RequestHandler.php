@@ -21,6 +21,7 @@ use Mmoreram\BaseBundle\Kernel\BaseKernel;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response as ReactResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class RequestHandler.
@@ -97,11 +98,6 @@ class RequestHandler
 
             $symfonyResponse = $this->kernel->handle($symfonyRequest);
             $this->kernel->terminate($symfonyRequest, $symfonyResponse);
-            $httpResponse = new \React\Http\Response(
-                $symfonyResponse->getStatusCode(),
-                $symfonyResponse->headers->all(),
-                $symfonyResponse->getContent()
-            );
             $to = microtime(true);
             $messages[] = new ConsoleMessage(
                 $request->getUri()->getPath(),
@@ -109,6 +105,17 @@ class RequestHandler
                 $symfonyResponse->getStatusCode(),
                 $symfonyResponse->getContent(),
                 \intval(($to - $from) * 1000)
+            );
+
+            $this->applyResponseEncoding(
+                $symfonyRequest,
+                $symfonyResponse
+            );
+
+            $httpResponse = new \React\Http\Response(
+                $symfonyResponse->getStatusCode(),
+                $symfonyResponse->headers->all(),
+                $symfonyResponse->getContent()
             );
 
             $symfonyRequest = null;
@@ -146,5 +153,46 @@ class RequestHandler
             ],
             ''
         );
+    }
+
+    /**
+     * Apply response encoding
+     *
+     * @param Request $request
+     * @param Response $response
+     */
+    private function applyResponseEncoding(
+        Request $request,
+        Response $response
+    )
+    {
+        $allowedCompressionAsString = $request
+            ->headers
+            ->get('Accept-Encoding');
+
+        if (!$allowedCompressionAsString) {
+            return;
+        }
+
+        $allowedCompression = explode(',', $allowedCompressionAsString);
+        $allowedCompression = array_map('trim', $allowedCompression);
+
+        if (in_array('gzip', $allowedCompression)) {
+            $response->setContent(gzencode($response->getContent()));
+            $response
+                ->headers
+                ->set('Content-Encoding', 'gzip');
+
+            return;
+        }
+
+        if (in_array('deflate', $allowedCompression)) {
+            $response->setContent(gzdeflate($response->getContent()));
+            $response
+                ->headers
+                ->set('Content-Encoding', 'deflate');
+
+            return;
+        }
     }
 }
