@@ -70,18 +70,10 @@ class RequestHandler
             $from = microtime(true);
             $method = $request->getMethod();
             $headers = $request->getHeaders();
-            $query = $request->getQueryParams();
-            $post = [];
-            if (!empty($body)) {
-                parse_str($body, $post);
-                $post = is_array($post)
-                    ? $post
-                    : [];
-            }
 
             $symfonyRequest = new Request(
-                $query,
-                $post,
+                $request->getQueryParams(),
+                $request->getParsedBody() ?? [],
                 $request->getAttributes(),
                 $request->getCookieParams(),
                 $request->getUploadedFiles(),
