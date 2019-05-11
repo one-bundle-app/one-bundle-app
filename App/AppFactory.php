@@ -17,7 +17,10 @@ declare(strict_types=1);
 
 namespace OneBundleApp\App;
 
+use Mmoreram\BaseBundle\Kernel\AsyncBaseKernel;
 use Mmoreram\BaseBundle\Kernel\BaseKernel;
+use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -33,27 +36,27 @@ class AppFactory
      * @param bool   $debug
      * @param bool   $async
      *
-     * @return BaseKernel
+     * @return BaseKernel|AsyncBaseKernel
      */
     public static function createApp(
         string $appPath,
         string $environment,
         bool $debug,
         bool $async = false
-    ): BaseKernel {
+    ) {
         $envPath = $appPath.'/.env';
         if (file_exists($envPath)) {
             $dotenv = new Dotenv();
             $dotenv->load($envPath);
         }
 
-        $oneBundleAppConfig = new \OneBundleApp\App\OneBundleAppConfig($appPath, $environment);
-        \Symfony\Component\Debug\ErrorHandler::register();
-        \Symfony\Component\Debug\ExceptionHandler::register();
+        $oneBundleAppConfig = new OneBundleAppConfig($appPath, $environment);
+        ErrorHandler::register();
+        ExceptionHandler::register();
 
         $kernelClass = $async
-            ? \Mmoreram\BaseBundle\Kernel\AsyncBaseKernel::class
-            : \Mmoreram\BaseBundle\Kernel\BaseKernel::class;
+            ? AsyncBaseKernel::class
+            : BaseKernel::class;
 
         return new $kernelClass(
             $oneBundleAppConfig->getBundles(),
