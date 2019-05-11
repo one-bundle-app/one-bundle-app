@@ -148,16 +148,15 @@ class RequestHandler
     }
 
     /**
-     * Apply response encoding
+     * Apply response encoding.
      *
-     * @param Request $request
+     * @param Request  $request
      * @param Response $response
      */
     private function applyResponseEncoding(
         Request $request,
         Response $response
-    )
-    {
+    ) {
         $allowedCompressionAsString = $request
             ->headers
             ->get('Accept-Encoding');

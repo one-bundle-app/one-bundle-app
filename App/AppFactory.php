@@ -31,13 +31,15 @@ class AppFactory
      * @param string $appPath
      * @param string $environment
      * @param bool   $debug
+     * @param bool   $async
      *
      * @return BaseKernel
      */
     public static function createApp(
         string $appPath,
         string $environment,
-        bool $debug
+        bool $debug,
+        bool $async = false
     ): BaseKernel {
         $envPath = $appPath.'/.env';
         if (file_exists($envPath)) {
@@ -49,7 +51,11 @@ class AppFactory
         \Symfony\Component\Debug\ErrorHandler::register();
         \Symfony\Component\Debug\ExceptionHandler::register();
 
-        return new \Mmoreram\BaseBundle\Kernel\BaseKernel(
+        $kernelClass = $async
+            ? \Mmoreram\BaseBundle\Kernel\AsyncBaseKernel::class
+            : \Mmoreram\BaseBundle\Kernel\BaseKernel::class;
+
+        return new $kernelClass(
             $oneBundleAppConfig->getBundles(),
             $oneBundleAppConfig->getConfig(),
             $oneBundleAppConfig->getRoutes(),
